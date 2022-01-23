@@ -13,7 +13,11 @@ const RootStack = createStackNavigator<ParamList>();
 
 const AppStack = () => {
   return (
-    <RootStack.Navigator initialRouteName={Screens.Home}>
+    <RootStack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}
+      initialRouteName={Screens.Home}>
       <RootStack.Screen name={Screens.Home} component={HomeScreen} />
     </RootStack.Navigator>
   );
@@ -27,7 +31,7 @@ export const AppNavigator = (props: NavigationProps) => {
 
   return (
     <NavigationContainer
-      theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
+      theme={colorScheme === 'light' ? DarkTheme : DefaultTheme}
       {...props}>
       <AppStack />
     </NavigationContainer>
