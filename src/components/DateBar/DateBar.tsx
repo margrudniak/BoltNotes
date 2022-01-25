@@ -1,16 +1,18 @@
 import React from 'react';
 import {Text, View} from 'react-native';
 
-export interface DateBarProps {}
+export interface DateBarProps {
+  date: string;
+}
 
-export const DateBar = ({message}: DateBarProps) => {
+export const DateBar = ({date}: DateBarProps) => {
   return (
     <View
       style={{
         backgroundColor: 'grey',
         padding: 10,
       }}>
-      <Text>{'24 stycznia 2022'}</Text>
+      <Text>{date}</Text>
     </View>
   );
 };
