@@ -10,6 +10,7 @@ import {
 
 export interface ButtonProps {
   style: StyleProp<ViewStyle> | StyleProp<ViewStyle>[];
+  disabled: boolean;
   onPress: (event: GestureResponderEvent) => void;
   text: string;
   textColor?: string;
@@ -18,21 +19,22 @@ export interface ButtonProps {
 export const Button = ({
   style,
   onPress,
+  disabled,
   text,
   textColor = 'black',
 }: ButtonProps) => {
   const {colors} = useTheme();
   return (
     <TouchableOpacity
-      {...{onPress}}
+      {...{onPress, disabled}}
       style={[
         {
           justifyContent: 'center',
           alignItems: 'center',
-          borderColor: colors.primary,
+          borderColor: disabled ? 'grey' : colors.primary,
           borderWidth: 3,
           borderRadius: 10,
-          backgroundColor: colors.primary,
+          backgroundColor: disabled ? 'grey' : colors.primary,
         },
         style,
       ]}>
