@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import {Button} from '..';
 import {checkIfExceeded, getDimensions} from '../../utils';
-
+import {saveOrPush} from '../../services/asyncStorage';
 export interface ModalProps {
   modalVisible: boolean;
   setModalVisible: Dispatch<SetStateAction<boolean>>;
@@ -25,6 +25,11 @@ export const Modal = ({modalVisible, setModalVisible}: ModalProps) => {
   const onDismissModal = () => {
     setModalVisible(false);
     setText('');
+  };
+
+  const onSave = async () => {
+    await saveOrPush(text);
+    onDismissModal();
   };
 
   const changeColor = () =>
@@ -83,8 +88,9 @@ export const Modal = ({modalVisible, setModalVisible}: ModalProps) => {
                 padding: 5,
               }}>{`${text.length} / ${maxLength}`}</Text>
             <Button
+              disabled={text.length > 0 ? false : true}
               text="ZAPISZ"
-              onPress={onDismissModal}
+              onPress={onSave}
               style={{height: 40}}
             />
           </View>
