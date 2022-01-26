@@ -5,7 +5,8 @@ import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {DateBar, Header, Item, Modal} from '../../components';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {objMap} from '../../utils';
+import {containsObject, objMap} from '../../utils';
+import {deleteItem, getAll} from '../../services/asyncStorage';
 
 export interface itemType {
   [key: string]: string[];
@@ -14,37 +15,40 @@ export interface itemType {
 export interface HomeScreenProps {}
 
 export const HomeScreen = ({}: HomeScreenProps) => {
+  const [render, setRender] = useState(false);
   const [values, setValues] = useState<itemType[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const {dark, colors} = useTheme();
   const {bottom, right} = useSafeAreaInsets();
 
   useEffect(() => {
-    AsyncStorage.getAllKeys((error?: Error, keys?: string[]) => {
-      keys?.map(e => {
-        AsyncStorage.getItem(e, (errorItem?: Error, result?: string) => {
-          try {
-            const valueArr = JSON.stringify(result)
-              .replace(/"|\\/g, '')
-              .split(',');
-            setValues(prev => [...prev, {[e]: valueArr}]);
-          } catch (err) {
-            console.error('Error', errorItem);
-          }
-        });
-      });
+    setValues([]);
+    getAll((e: {[x: string]: string[]}) => {
+      setValues(prev => [...prev, e]);
     });
-  }, [modalVisible]);
+  }, [render]);
+
+  const onSaveData = () => setRender(prev => !prev);
+
+  const handleDelete = async (keyOfDate: string, id: number) =>
+    deleteItem(keyOfDate, id, () => onSaveData());
 
   const renderContent = () => {
     const renderContentItems: JSX.Element[] = [];
     values.map((e, i) => {
-      renderContentItems.push(
-        <DateBar key={`${e}${i}`} date={Object.keys(e).toString()} />,
-      );
+      Object.values(e)[0].length !== 0 &&
+        renderContentItems.push(
+          <DateBar key={`${e}${i}`} date={Object.keys(e).toString()} />,
+        );
       objMap(e, (el: string[]) =>
         el.map((ele, it) => {
-          renderContentItems.push(<Item key={it} title={ele + ''} />);
+          renderContentItems.push(
+            <Item
+              key={`${ele}${it}`}
+              title={ele + ''}
+              onDelete={() => handleDelete(Object.keys(e).toString(), it)}
+            />,
+          );
         }),
       );
     });
@@ -108,7 +112,7 @@ export const HomeScreen = ({}: HomeScreenProps) => {
           marginRight: right,
         }}
       />
-      <Modal {...{modalVisible, setModalVisible}} />
+      <Modal {...{modalVisible, setModalVisible, onSaveData}} />
     </SafeAreaView>
   );
 };

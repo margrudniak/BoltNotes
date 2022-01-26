@@ -13,9 +13,14 @@ import {saveOrPush} from '../../services/asyncStorage';
 export interface ModalProps {
   modalVisible: boolean;
   setModalVisible: Dispatch<SetStateAction<boolean>>;
+  onSaveData: () => void;
 }
 
-export const Modal = ({modalVisible, setModalVisible}: ModalProps) => {
+export const Modal = ({
+  modalVisible,
+  setModalVisible,
+  onSaveData,
+}: ModalProps) => {
   const [text, setText] = useState('');
   const {dark} = useTheme();
   const {width} = getDimensions('window');
@@ -30,6 +35,7 @@ export const Modal = ({modalVisible, setModalVisible}: ModalProps) => {
   const onSave = async () => {
     await saveOrPush(text);
     onDismissModal();
+    onSaveData();
   };
 
   const changeColor = () =>
