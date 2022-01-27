@@ -18,7 +18,7 @@ export const saveOrPush = async (value: string) => {
             console.log('Data Not Found');
             await AsyncStorage.setItem(
               getFormatedDate(new Date()),
-              JSON.stringify(value),
+              JSON.stringify([value]),
             );
           }
         } catch (e) {
