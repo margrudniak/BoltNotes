@@ -56,6 +56,11 @@ export const HomeScreen = ({}: HomeScreenProps) => {
     return renderContentItems;
   };
 
+  const handleSaveRecord = () => {
+    setVoiceRecord(false);
+    onSaveData();
+  };
+
   return (
     <>
       <SafeAreaView
@@ -65,37 +70,26 @@ export const HomeScreen = ({}: HomeScreenProps) => {
         <Header onPressNote={setModalVisible} />
         {renderContent()}
         <Icon
-          size={60}
-          name="add-circle"
-          color={'red'}
-          onPress={async () => {
-            let test = await AsyncStorage.clear();
-            console.log(test);
-          }}
-          style={{
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            marginBottom: bottom,
-            marginRight: right,
-          }}
-        />
-        <Icon
-          size={60}
+          size={80}
           name="add-circle"
           color={colors.primary}
           onPress={() => setVoiceRecord(true)}
           style={{
             position: 'absolute',
-            bottom: 0,
-            right: 0,
+            bottom: 20,
+            right: 20,
             marginBottom: bottom,
             marginRight: right,
           }}
         />
         <Modal {...{modalVisible, setModalVisible, onSaveData}} />
       </SafeAreaView>
-      {voiceRecord && <VoiceRecord />}
+      {voiceRecord && (
+        <VoiceRecord
+          onSave={handleSaveRecord}
+          onDismiss={() => setVoiceRecord(false)}
+        />
+      )}
     </>
   );
 };
