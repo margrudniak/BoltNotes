@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   ViewStyle,
 } from 'react-native';
-
+import styles from './Button.style';
 export interface ButtonProps {
   style: StyleProp<ViewStyle> | StyleProp<ViewStyle>[];
   disabled: boolean;
@@ -28,12 +28,9 @@ export const Button = ({
     <TouchableOpacity
       {...{onPress, disabled}}
       style={[
+        styles.container,
         {
-          justifyContent: 'center',
-          alignItems: 'center',
           borderColor: disabled ? 'grey' : colors.primary,
-          borderWidth: 3,
-          borderRadius: 10,
           backgroundColor: disabled ? 'grey' : colors.primary,
         },
         style,

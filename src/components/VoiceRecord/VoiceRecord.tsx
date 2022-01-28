@@ -8,7 +8,7 @@ import Voice, {
   SpeechEndEvent,
 } from '@react-native-voice/voice';
 import {saveOrPush} from '../../services/asyncStorage';
-
+import styles from './VoiceRecord.style';
 export interface VoiceRecordProps {
   onSave: () => void;
   onDismiss: () => void;
@@ -149,38 +149,27 @@ export const VoiceRecord = ({onSave, onDismiss}: VoiceRecordProps) => {
   };
 
   return (
-    <View
-      style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        bottom: 0,
-        right: 0,
-        justifyContent: 'space-evenly',
-        backgroundColor: 'rgba(52, 52, 52, 0.9)',
-      }}>
-      <Text style={{alignSelf: 'center'}}>{results[0]}</Text>
+    <View style={styles.wrapper}>
+      <Text style={styles.alignSelf}>{results[0]}</Text>
       <AnimatedIcon
         size={200}
         name="microphone"
         onPress={startRecognizing}
-        style={{
-          alignSelf: 'center',
-          transform: [
-            {
-              rotate: spinValue.interpolate({
-                inputRange: [0, 1],
-                outputRange: ['0deg', '360deg'],
-              }),
-            },
-          ],
-        }}
+        style={[
+          styles.alignSelf,
+          {
+            transform: [
+              {
+                rotate: spinValue.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: ['0deg', '360deg'],
+                }),
+              },
+            ],
+          },
+        ]}
       />
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-around',
-        }}>
+      <View style={styles.groupButtons}>
         {isStopped ? (
           <>
             <Icon size={50} name="play" onPress={handleStart} />

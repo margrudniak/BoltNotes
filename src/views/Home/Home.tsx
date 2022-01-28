@@ -7,7 +7,7 @@ import {DateBar, Header, Item, Modal, VoiceRecord} from '../../components';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {containsObject, objMap} from '../../utils';
 import {deleteItem, getAll} from '../../services/asyncStorage';
-
+import styles from './Home.style';
 export interface itemType {
   [key: string]: string[];
 }
@@ -65,7 +65,7 @@ export const HomeScreen = ({}: HomeScreenProps) => {
     <>
       <SafeAreaView
         edges={['top', 'left', 'right']}
-        style={{flex: 1, backgroundColor: colors.background}}>
+        style={[styles.wrapper, {backgroundColor: colors.background}]}>
         <StatusBar barStyle={dark ? 'light-content' : 'dark-content'} />
         <Header onPressNote={setModalVisible} />
         {renderContent()}
@@ -74,13 +74,13 @@ export const HomeScreen = ({}: HomeScreenProps) => {
           name="add-circle"
           color={colors.primary}
           onPress={() => setVoiceRecord(true)}
-          style={{
-            position: 'absolute',
-            bottom: 20,
-            right: 20,
-            marginBottom: bottom,
-            marginRight: right,
-          }}
+          style={[
+            styles.addButton,
+            {
+              marginBottom: bottom,
+              marginRight: right,
+            },
+          ]}
         />
         <Modal {...{modalVisible, setModalVisible, onSaveData}} />
       </SafeAreaView>

@@ -1,6 +1,7 @@
 import React from 'react';
 import {Alert, GestureResponderEvent, Text, View} from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
+import styles from './Item.style';
 export interface ItemProps {
   title: string;
   onDelete: (event: GestureResponderEvent) => void;
@@ -18,24 +19,14 @@ export const Item = ({title, onDelete}: ItemProps) => {
     ]);
 
   return (
-    <View
-      style={{
-        flexDirection: 'row',
-        backgroundColor: 'white',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 10,
-      }}>
-      <Text style={{flex: 6}}>{title}</Text>
+    <View style={styles.wrapper}>
+      <Text style={styles.text}>{title}</Text>
       <Icon
         size={30}
         name="delete"
         color={'black'}
         onPress={handleDelete}
-        style={{
-          padding: 5,
-          paddingLeft: 10,
-        }}
+        style={styles.iconDelete}
       />
     </View>
   );

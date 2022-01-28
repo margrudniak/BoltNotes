@@ -2,7 +2,7 @@ import {useTheme} from '@react-navigation/native';
 import React, {Dispatch, SetStateAction} from 'react';
 import {View} from 'react-native';
 import Icon from 'react-native-vector-icons/SimpleLineIcons';
-
+import styles from './Header.style';
 export interface HeaderProps {
   onPressNote: Dispatch<SetStateAction<boolean>>;
 }
@@ -10,12 +10,7 @@ export interface HeaderProps {
 export const Header = ({onPressNote}: HeaderProps) => {
   const {dark} = useTheme();
   return (
-    <View
-      style={{
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        padding: 20,
-      }}>
+    <View style={styles.wrapper}>
       <Icon
         name="menu"
         size={20}
@@ -29,7 +24,7 @@ export const Header = ({onPressNote}: HeaderProps) => {
         backgroundColor={'transparent'}
         color={dark ? 'white' : 'black'}
         onPress={() => onPressNote(true)}
-        style={{padding: 0}}
+        style={styles.noteButton}
       />
     </View>
   );
