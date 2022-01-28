@@ -1,2 +1,2 @@
 export const checkIfExceeded = (value: number, limit: number) =>
-  value <= limit ? false : true;
+  value === limit ? true : false;
