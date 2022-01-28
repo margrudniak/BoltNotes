@@ -1,4 +1,10 @@
-import React, {Dispatch, SetStateAction, useRef, useState} from 'react';
+import React, {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import {useTheme} from '@react-navigation/native';
 import {
   Modal as NativeModal,
@@ -41,6 +47,11 @@ export const Modal = ({
   const changeColor = () =>
     checkIfExceeded(text.length, maxLength) ? 'red' : 'black';
 
+  const handleOnLayout = () =>
+    setTimeout(() => {
+      refInput?.current?.focus();
+    }, 100);
+
   return (
     <View>
       <NativeModal
@@ -72,7 +83,7 @@ export const Modal = ({
             <Text>{'Nowa notatka'}</Text>
             <TextInput
               ref={refInput}
-              onLayout={() => refInput?.current?.focus()}
+              onLayout={handleOnLayout}
               multiline
               maxLength={maxLength}
               onChangeText={setText}
@@ -84,7 +95,7 @@ export const Modal = ({
                 borderWidth: 2,
                 borderRadius: 10,
                 width: 0.8 * width,
-                height: 100,
+                height: 150,
               }}
             />
             <Text
