@@ -22,11 +22,14 @@ export const Header = ({onPressNote}: HeaderProps) => {
         color={dark ? 'white' : 'black'}
         onPress={() => console.log('clicked burger')}
       />
-      <Icon
+      <Icon.Button
         name="note"
         size={20}
+        hitSlop={{top: 100, bottom: 200, left: 200, right: 100}}
+        backgroundColor={'transparent'}
         color={dark ? 'white' : 'black'}
         onPress={() => onPressNote(true)}
+        style={{padding: 0}}
       />
     </View>
   );
