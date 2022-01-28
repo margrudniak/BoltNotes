@@ -9,7 +9,7 @@ export const saveOrPush = async (value: string) => {
         try {
           if (result !== null) {
             console.log('Data Found', result);
-            const newIds = JSON.parse(result!).concat(value);
+            const newIds = JSON.parse(result!).concat(value.toLowerCase());
             AsyncStorage.setItem(
               getFormatedDate(new Date()),
               JSON.stringify(newIds),
@@ -18,7 +18,7 @@ export const saveOrPush = async (value: string) => {
             console.log('Data Not Found');
             await AsyncStorage.setItem(
               getFormatedDate(new Date()),
-              JSON.stringify([value]),
+              JSON.stringify([value.toLowerCase()]),
             );
           }
         } catch (e) {
