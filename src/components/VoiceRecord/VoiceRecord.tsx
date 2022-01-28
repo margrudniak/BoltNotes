@@ -1,46 +1,33 @@
-import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Animated, Easing, Text, View} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Voice, {
-  SpeechRecognizedEvent,
   SpeechResultsEvent,
   SpeechErrorEvent,
   SpeechStartEvent,
   SpeechEndEvent,
-  SpeechVolumeChangeEvent,
 } from '@react-native-voice/voice';
+import {saveOrPush} from '../../services/asyncStorage';
 
-export interface VoiceRecordProps {}
+export interface VoiceRecordProps {
+  onSave: () => void;
+  onDismiss: () => void;
+}
 
-export const VoiceRecord = ({}: VoiceRecordProps) => {
-  const [pitch, setPitch] = useState('');
-  const [recognized, setRecognized] = useState('');
+export const VoiceRecord = ({onSave, onDismiss}: VoiceRecordProps) => {
   const [error, setError] = useState('');
-  const [end, setEnd] = useState('');
-  const [started, setStarted] = useState('');
+  const [isRunning, setIsRunning] = useState(true);
+  const [isStopped, setIsStopped] = useState(false);
   const [results, setResults] = useState([]);
-  const [partialResults, setPartialResults] = useState([]);
-  const spinValue = useRef(new Animated.Value(0)).current;
   const AnimatedIcon = Animated.createAnimatedComponent(Icon);
+  const spinValue = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Animated.loop(
-      Animated.timing(spinValue, {
-        toValue: 1,
-        duration: 2000,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      }),
-    ).start();
-
     //Setting callbacks for the process status
     Voice.onSpeechStart = onSpeechStart;
-    Voice.onSpeechRecognized = onSpeechRecognized;
     Voice.onSpeechEnd = onSpeechEnd;
     Voice.onSpeechError = onSpeechError;
     Voice.onSpeechResults = onSpeechResults;
-    Voice.onSpeechPartialResults = onSpeechPartialResults;
-    Voice.onSpeechVolumeChanged = onSpeechVolumeChanged;
     setTimeout(() => {
       startRecognizing();
     }, 0);
@@ -51,22 +38,42 @@ export const VoiceRecord = ({}: VoiceRecordProps) => {
     };
   }, []);
 
+  useEffect(() => {
+    if (isRunning) {
+      runAnimation();
+    } else {
+      //When stopping reset the value to 0 so animated item doesn't stop in a random position
+      spinValue.stopAnimation();
+      spinValue.setValue(0);
+    }
+
+    //Return a function from useEffect to stop the animation on unmount
+    return () => spinValue.stopAnimation();
+  }, [isRunning, spinValue]);
+
+  const runAnimation = () => {
+    spinValue.setValue(0);
+    Animated.timing(spinValue, {
+      toValue: 1,
+      duration: 2000,
+      easing: Easing.linear,
+      useNativeDriver: true,
+    }).start(o => {
+      if (o.finished) {
+        runAnimation();
+      }
+    });
+  };
+
   const onSpeechStart = (e: SpeechStartEvent) => {
     //Invoked when .start() is called without error
     console.log('onSpeechStart: ', e);
-    setStarted('√');
-  };
-
-  const onSpeechRecognized = (e: SpeechRecognizedEvent) => {
-    //Invoked when .start() is called without error
-    console.log('onSpeechStart: ', e);
-    setRecognized('√');
   };
 
   const onSpeechEnd = (e: SpeechEndEvent) => {
     //Invoked when SpeechRecognizer stops recognition
     console.log('onSpeechEnd: ', e);
-    setEnd('√');
+    setIsRunning(false);
   };
 
   const onSpeechError = (e: SpeechErrorEvent) => {
@@ -81,32 +88,16 @@ export const VoiceRecord = ({}: VoiceRecordProps) => {
     setResults(e.value);
   };
 
-  const onSpeechPartialResults = (e: SpeechResultsEvent) => {
-    //Invoked when any results are computed
-    console.log('onSpeechPartialResults: ', e);
-    setPartialResults(e.value);
-  };
-
-  const onSpeechVolumeChanged = (e: SpeechVolumeChangeEvent) => {
-    //Invoked when pitch that is recognized changed
-    console.log('onSpeechVolumeChanged: ', e);
-    setPitch(e.value);
-  };
-
   const startRecognizing = async () => {
     //Starts listening for speech for a specific locale
+    console.log('startRecognizing');
     try {
-      console.log('startRecognizing');
-      await Voice.start('en-US');
-      setPitch('');
-      setError('');
-      setStarted('');
-      setResults([]);
-      setPartialResults([]);
-      setEnd('');
+      await Voice.start('pl');
     } catch (e) {
       console.error(e);
     }
+    setError('');
+    setResults([]);
   };
 
   const stopRecognizing = async () => {
@@ -118,28 +109,43 @@ export const VoiceRecord = ({}: VoiceRecordProps) => {
     }
   };
 
-  const cancelRecognizing = async () => {
-    //Cancels the speech recognition
+  const destroyRecognizer = async () => {
+    //Destroys the current SpeechRecognizer instance
     try {
-      await Voice.cancel();
+      await Voice.destroy();
+      setError('');
+      setResults([]);
     } catch (e) {
       console.error(e);
     }
   };
 
-  const destroyRecognizer = async () => {
-    //Destroys the current SpeechRecognizer instance
-    try {
-      await Voice.destroy();
-      setPitch('');
-      setError('');
-      setStarted('');
-      setResults([]);
-      setPartialResults([]);
-      setEnd('');
-    } catch (e) {
-      console.error(e);
-    }
+  const handleStart = async () => {
+    setIsRunning(true);
+    setIsStopped(false);
+    await startRecognizing();
+  };
+
+  const handleRepeat = async () => {
+    setIsRunning(true);
+    await destroyRecognizer();
+    await startRecognizing();
+  };
+
+  const handleStop = async () => {
+    setIsRunning(false);
+    setIsStopped(true);
+    await stopRecognizing();
+    await destroyRecognizer();
+  };
+
+  const handleSave = async () => {
+    await saveOrPush(`${results[0]}`);
+    onSave();
+  };
+
+  const handleDismiss = () => {
+    onDismiss();
   };
 
   return (
@@ -150,18 +156,16 @@ export const VoiceRecord = ({}: VoiceRecordProps) => {
         left: 0,
         bottom: 0,
         right: 0,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(52, 52, 52, 0.5)',
+        justifyContent: 'space-evenly',
+        backgroundColor: 'rgba(52, 52, 52, 0.9)',
       }}>
-      {results.map((result, index) => {
-        return <Text key={`result-${index}`}>{result}</Text>;
-      })}
+      <Text style={{alignSelf: 'center'}}>{results[0]}</Text>
       <AnimatedIcon
         size={200}
         name="microphone"
         onPress={startRecognizing}
         style={{
+          alignSelf: 'center',
           transform: [
             {
               rotate: spinValue.interpolate({
@@ -172,6 +176,25 @@ export const VoiceRecord = ({}: VoiceRecordProps) => {
           ],
         }}
       />
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-around',
+        }}>
+        {isStopped ? (
+          <>
+            <Icon size={50} name="play" onPress={handleStart} />
+          </>
+        ) : isRunning ? (
+          <Icon size={50} name="stop" onPress={handleStop} />
+        ) : (
+          <>
+            <Icon size={50} name="remove" onPress={handleDismiss} />
+            <Icon size={50} name="repeat" onPress={handleRepeat} />
+            <Icon size={50} name="check" onPress={handleSave} />
+          </>
+        )}
+      </View>
     </View>
   );
 };
