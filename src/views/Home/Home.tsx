@@ -1,11 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import {useTheme} from '@react-navigation/native';
-import {StatusBar, View} from 'react-native';
+import {StatusBar} from 'react-native';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {DateBar, Header, Item, Modal, VoiceRecord} from '../../components';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {containsObject, objMap} from '../../utils';
+import {objMap} from '../../utils';
 import {deleteItem, getAll} from '../../services/asyncStorage';
 import styles from './Home.style';
 export interface itemType {

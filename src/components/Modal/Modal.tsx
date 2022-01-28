@@ -1,10 +1,4 @@
-import React, {
-  Dispatch,
-  SetStateAction,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, {Dispatch, SetStateAction, useRef, useState} from 'react';
 import {useTheme} from '@react-navigation/native';
 import {
   Modal as NativeModal,
